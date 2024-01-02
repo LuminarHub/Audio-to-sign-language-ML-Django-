@@ -8,6 +8,8 @@ from nltk.stem import WordNetLemmatizer
 import nltk
 from django.contrib.staticfiles import finders
 from django.contrib.auth.decorators import login_required
+from langdetect import detect
+from googletrans import Translator
 
 def home_view(request):
 	return render(request,'home.html')
@@ -24,6 +26,11 @@ def contact_view(request):
 def animation_view(request):
 	if request.method == 'POST':
 		text = request.POST.get('sen')
+		if not text:  # Check if text is empty or None
+			return render(request, 'animation.html', {'words': [], 'text': None})
+		translator = Translator()
+		translation = translator.translate(text, dest="en")
+		text = translation.text
 		#tokenizing the sentence
 		text.lower()
 		#tokenizing the sentence
@@ -40,7 +47,6 @@ def animation_view(request):
 
 		#stopwords that will be removed
 		stop_words = set(["mightn't", 're', 'wasn', 'wouldn', 'be', 'has', 'that', 'does', 'shouldn', 'do', "you've",'off', 'for', "didn't", 'm', 'ain', 'haven', "weren't", 'are', "she's", "wasn't", 'its', "haven't", "wouldn't", 'don', 'weren', 's', "you'd", "don't", 'doesn', "hadn't", 'is', 'was', "that'll", "should've", 'a', 'then', 'the', 'mustn', 'i', 'nor', 'as', "it's", "needn't", 'd', 'am', 'have',  'hasn', 'o', "aren't", "you'll", "couldn't", "you're", "mustn't", 'didn', "doesn't", 'll', 'an', 'hadn', 'whom', 'y', "hasn't", 'itself', 'couldn', 'needn', "shan't", 'isn', 'been', 'such', 'shan', "shouldn't", 'aren', 'being', 'were', 'did', 'ma', 't', 'having', 'mightn', 've', "isn't", "won't"])
-
 
 
 		#removing stopwords and applying lemmatizing nlp process to words
@@ -97,7 +103,7 @@ def animation_view(request):
 			#otherwise animation of word
 			else:
 				filtered_text.append(w)
-		words = filtered_text;
+		words = filtered_text
 
 
 		return render(request,'animation.html',{'words':words,'text':text})

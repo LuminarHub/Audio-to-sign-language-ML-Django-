@@ -4,26 +4,36 @@
 
 {% block content %}
 <div class="split left">
-	<h2 align="center">Enter Text or Use Mic</h2>
+	<h2 align="center" style="color: black;">Enter Text or Use Mic</h2>
 	<br>
 		<form action="" method="post" align="left">
 		{% csrf_token %}
+			<select id="languageSelect">
+				<option value="english">English</option>
+				<option value="malayalam">Malayalam</option>
+				<option value="hindi">Hindi</option>
+			</select>
 					<input type="text" name="sen" class="mytext" id="speechToText" placeholder="">
-					<button type="button" name="button" class="mic" onclick="record()"><img src="{% static 'mic3.png' %}" height="32px" width="38px" /></button>
-		  			&nbsp&nbsp&nbsp&nbsp
+					<button type="button" name="button" class="mic" onclick="record(document.getElementById('languageSelect').value)">
+					     <img src="{% static 'mic3.png' %}" height="32px" width="38px" />
+					</button>
+		  			{% comment %} <button class="mic" onclick="record(document.getElementById('languageSelect').value)">
+    <img src="{% static 'mic3.png' %}" height="32px" width="38px" />
+</button> {% endcomment %}
+					&nbsp&nbsp&nbsp&nbsp
 		  			<input type="submit" name="submit" class="submit">
 
 		</form>
 		<br>
 		<table cellspacing="20px">
 			<tr>
-				<td class="td">The text that you entered is:</td>
-				<td class="td">{{ text }}</td>
+				<td >The text that you entered is:</td>
+				<td style="color:black;">{{ text }}</td>
 			</tr>
 			<tr>
-				<td class="td">Key words in sentence:</td>
-				<td class="td">
-				<ul class="td" id="list" align="center">
+				<td >Key words in sentence:</td>
+				<td >
+				<ul  id="list" align="center">
   					{% for word in words %}
     				<li id="{{ i }}" style="margin-right: 8px">{{ word }}</li>
   					{% endfor %}
@@ -32,7 +42,7 @@
 		</tr>
 	</table></div>
   <div class="split right">
-  <h2 align="center">Sign Language Animation</h2>
+  <h2 align="center" style="color: black;">Sign Language Animation</h2>
 
 	<div style="text-align:center">	&nbsp&nbsp
   	<button class="submit" onclick="playPause()">Play/Pause</button>
@@ -51,17 +61,24 @@
 
 
 <script>
-	//webkitSpeechRecognition api for speech to text conversion
-	function record(){
+	function record(language){
 		var recognition = new webkitSpeechRecognition();
-		recognition.lang='en-IN';
+		if (language === 'hindi') {
+			recognition.lang = 'hi-IN';
+		} else if (language === 'malayalam') {
+			recognition.lang = 'ml-IN'; // Use 'ml-IN' for Malayalam
+		} else {
+			recognition.lang = 'en-IN';
+		}
 
 		recognition.onresult = function(event){
 			console.log(event)
 			document.getElementById('speechToText').value = event.results[0][0].transcript;
 		}
 		recognition.start();
-	 }
+	}
+
+
 	function play()
 	{
 		var videoSource = new Array();
@@ -105,21 +122,6 @@
 	    	}
 		}
 	}
-	/* LETS USE ONLY PLAY PAUSE BUTTON WITH 720 *420 ,IT FITS THE SCREEN
-	function makeBig() {
-	    document.getElementById("videoPlayer").width = 560;
-		document.getElementById("videoPlayer").height = 360;
-	}
-
-	function makeSmall() {
-	    document.getElementById("videoPlayer").width = 320;
-		document.getElementById("videoPlayer").height = 180;
-	}
-
-	function makeNormal() {
-	    document.getElementById("videoPlayer").width = 420;
-		document.getElementById("videoPlayer").height =280;
-	}*/
 	function playPause(){
   		if (document.getElementById("videoPlayer").paused){
     		play();}
